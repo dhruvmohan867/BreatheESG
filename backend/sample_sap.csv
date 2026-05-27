@@ -1,0 +1,7 @@
+source_type,category,quantity,unit,date
+Diesel Generator,Stationary Combustion,500,Liters,2023-10-01
+Company Car,Mobile Combustion,50,Ltr,02/10/2023
+Forklift,Mobile Combustion,0.5,KL,10/03/2023
+Heating Oil,Stationary Combustion,-100,Liters,2023-10-04
+Truck,Mobile Combustion,200,,2023-10-05
+Generator,Stationary Combustion,300,L,invalid-date
