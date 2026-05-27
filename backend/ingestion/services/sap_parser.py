@@ -20,18 +20,27 @@ class SAPParserService(BaseParserService):
                 return factor
         return None
 
+    def _get_val(self, row, keys, default=''):
+        for k in keys:
+            if k in row:
+                return row.get(k, default).strip()
+        for key in row.keys():
+            if key.lower() in [k.lower() for k in keys]:
+                return row.get(key, default).strip()
+        return default
+
     def process(self):
         rows = self.read_csv()
         records = []
 
         for idx, row in enumerate(rows, start=1):
-            plant = row.get('WERKS', '').strip()
-            material_num = row.get('MATNR', '').strip()
-            material_desc = row.get('MAKTX', '').strip()
-            raw_unit = row.get('MEINS', '').strip()
-            date_str = row.get('BUDAT', '').strip()
-            quantity_str = row.get('MENGE', '').strip()
-            cost_center = row.get('KOSTL', '').strip()
+            plant = self._get_val(row, ['WERKS', 'Plant'])
+            material_num = self._get_val(row, ['MATNR', 'Material'])
+            material_desc = self._get_val(row, ['MAKTX', 'Material_Description', 'Description'])
+            raw_unit = self._get_val(row, ['MEINS', 'Unit', 'UOM'])
+            date_str = self._get_val(row, ['BUDAT', 'Posting_Date', 'PostingDate', 'Date'])
+            quantity_str = self._get_val(row, ['MENGE', 'Quantity', 'Qty', 'DMBTR', 'Amount_LC', 'Amount'])
+            cost_center = self._get_val(row, ['KOSTL', 'CostCenter', 'Cost_Center'])
 
             is_suspicious = False
             reasons = []
@@ -47,14 +56,14 @@ class SAPParserService(BaseParserService):
 
             if not raw_unit:
                 is_suspicious = True
-                reasons.append("Missing unit (MEINS)")
+                reasons.append("Missing unit")
 
             normalized_unit, normalized_value = self.normalize_unit(raw_unit, raw_value)
 
             reporting_date = self.parse_date(date_str)
             if not reporting_date:
                 is_suspicious = True
-                reasons.append("Invalid or missing date (BUDAT)")
+                reasons.append("Invalid or missing date")
                 reporting_date = datetime.now().date()
 
             ef = self._guess_fuel_factor(material_desc)
@@ -62,7 +71,12 @@ class SAPParserService(BaseParserService):
             if ef and normalized_value > 0 and normalized_unit == 'L':
                 co2 = round(normalized_value * ef, 2)
 
-            category = f"{material_desc} [{plant}/{cost_center}]"
+            if plant and cost_center:
+                category = f"{material_desc or material_num} [{plant}/{cost_center}]"
+            elif plant:
+                category = f"{material_desc or material_num} [{plant}]"
+            else:
+                category = material_desc or material_num or "Unknown Material"
 
             records.append(EmissionRecord(
                 company=self.upload.company,

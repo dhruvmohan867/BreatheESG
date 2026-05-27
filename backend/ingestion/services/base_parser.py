@@ -25,6 +25,9 @@ class BaseParserService:
         'kl': ('L', 1000),
         'kiloliters': ('L', 1000),
         'kiloliter': ('L', 1000),
+        'gal': ('L', 3.78541),
+        'gallon': ('L', 3.78541),
+        'gallons': ('L', 3.78541),
         'kwh': ('kWh', 1),
         'mwh': ('kWh', 1000),
         'gwh': ('kWh', 1000000),
@@ -34,7 +37,10 @@ class BaseParserService:
         'scm': ('SCM', 1),
     }
 
-    DATE_FORMATS = ['%Y-%m-%d', '%d/%m/%Y', '%m/%d/%Y', '%d-%m-%Y']
+    DATE_FORMATS = [
+        '%Y-%m-%d', '%d/%m/%Y', '%m/%d/%Y', '%d-%m-%Y',
+        '%d.%m.%Y', '%Y/%m/%d', '%d-%b-%Y'
+    ]
 
     def __init__(self, file_obj, upload):
         self.file_obj = file_obj
