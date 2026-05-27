@@ -4,17 +4,16 @@ from .models import Company, EmissionRecord
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created_at', 'updated_at')
+    list_display = ('name', 'industry', 'created_at')
     search_fields = ('name',)
 
 
 @admin.register(EmissionRecord)
 class EmissionRecordAdmin(admin.ModelAdmin):
     list_display = (
-        'source_type', 'category', 'reporting_date',
-        'raw_value', 'raw_unit', 'normalized_value', 'normalized_unit',
+        'source_type', 'scope', 'category', 'reporting_date',
+        'raw_value', 'raw_unit', 'co2_kg',
         'is_suspicious', 'status', 'upload',
     )
-    list_filter = ('is_suspicious', 'status', 'source_type', 'company')
+    list_filter = ('is_suspicious', 'status', 'source_type', 'scope', 'company')
     search_fields = ('category', 'suspicious_reason')
-    readonly_fields = ('created_at', 'updated_at')

@@ -1,7 +1,11 @@
-source_type,category,quantity,unit,date
-Diesel Generator,Stationary Combustion,500,Liters,2023-10-01
-Company Car,Mobile Combustion,50,Ltr,02/10/2023
-Forklift,Mobile Combustion,0.5,KL,10/03/2023
-Heating Oil,Stationary Combustion,-100,Liters,2023-10-04
-Truck,Mobile Combustion,200,,2023-10-05
-Generator,Stationary Combustion,300,L,invalid-date
+WERKS,MATNR,MAKTX,MENGE,MEINS,BUDAT,KOSTL,BWART
+1010,50000120,Diesel Fuel - Generator,4500,L,2024-01-15,CC4010,101
+1010,50000120,Diesel Fuel - Generator,3800,LTR,15/02/2024,CC4010,101
+1020,50000135,Petrol - Fleet Vehicles,320,L,2024-01-22,CC5020,101
+1010,50000140,LPG - Canteen,2.5,KL,2024-02-01,CC4010,101
+1020,50000120,Diesel Fuel - Backup Gen,-500,L,2024-02-10,CC5020,101
+1030,50000155,Natural Gas - Heating,1200,SCM,28/02/2024,CC6010,101
+1010,50000120,Diesel Fuel - Generator,5100,,2024-03-01,CC4010,101
+1020,50000135,Petrol - Fleet Vehicles,280,L,ungueltig-datum,CC5020,101
+1010,50000160,Furnace Oil - Boiler,8500,L,2024-03-15,CC4010,101
+1030,50000140,LPG - Kitchen,180,L,01/04/2024,CC6010,101

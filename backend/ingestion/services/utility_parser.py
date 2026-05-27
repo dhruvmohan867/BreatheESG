@@ -1,6 +1,6 @@
 from datetime import datetime
 from emissions.models import EmissionRecord
-from .base_parser import BaseParserService
+from .base_parser import BaseParserService, EMISSION_FACTORS
 
 
 class UtilityParserService(BaseParserService):
@@ -17,11 +17,15 @@ class UtilityParserService(BaseParserService):
         median_val = sorted(values_for_spike)[len(values_for_spike) // 2] if values_for_spike else 0
 
         for idx, row in enumerate(rows, start=1):
+            account = row.get('account_number', '').strip()
             meter_id = row.get('meter_id', '').strip()
             provider = row.get('provider', '').strip()
+            facility = row.get('facility', '').strip()
             raw_unit = row.get('unit', '').strip() or 'kWh'
             date_str = row.get('reading_date', '').strip()
             quantity_str = row.get('kwh_consumed', '').strip()
+            billing_start = row.get('billing_period_start', '').strip()
+            billing_end = row.get('billing_period_end', '').strip()
 
             is_suspicious = False
             reasons = []
@@ -51,33 +55,37 @@ class UtilityParserService(BaseParserService):
 
             reporting_date = self.parse_date(date_str)
             if not reporting_date:
+                reporting_date = self.parse_date(billing_end)
+            if not reporting_date:
                 is_suspicious = True
                 reasons.append("Invalid or missing date")
                 reporting_date = datetime.now().date()
 
-            category = f"{provider} — {meter_id}" if provider and meter_id else provider or meter_id or "Unknown"
+            ef = EMISSION_FACTORS['electricity_india']
+            co2 = None
+            if normalized_value > 0 and normalized_unit == 'kWh':
+                co2 = round(normalized_value * ef, 2)
+
+            parts = [p for p in [facility, provider, meter_id] if p]
+            category = " | ".join(parts) if parts else "Unknown"
 
             records.append(EmissionRecord(
                 company=self.upload.company,
                 upload=self.upload,
                 row_number=idx,
                 source_type='utility',
+                scope=2,
                 category=category,
                 raw_value=raw_value,
                 normalized_value=normalized_value,
                 raw_unit=raw_unit,
                 normalized_unit=normalized_unit,
+                emission_factor=ef,
+                co2_kg=co2,
                 reporting_date=reporting_date,
                 is_suspicious=is_suspicious,
                 suspicious_reason="; ".join(reasons),
             ))
 
         EmissionRecord.objects.bulk_create(records)
-
-        suspicious_count = sum(1 for r in records if r.is_suspicious)
-        self.upload.row_count = len(records)
-        self.upload.suspicious_count = suspicious_count
-        self.upload.status = 'completed'
-        self.upload.save()
-
-        return len(records)
+        return self.finalize_upload(records)

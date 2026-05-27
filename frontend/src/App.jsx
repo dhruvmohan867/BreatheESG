@@ -4,48 +4,51 @@ import DashboardPage from './pages/DashboardPage';
 import SuspiciousPage from './pages/SuspiciousPage';
 import AuditLogPage from './pages/AuditLogPage';
 
-const NAV_ITEMS = [
-  { path: '/', label: 'Dashboard', icon: '📊' },
-  { path: '/upload', label: 'Upload', icon: '📤' },
-  { path: '/suspicious', label: 'Suspicious', icon: '⚠️' },
-  { path: '/audit-log', label: 'Audit Trail', icon: '📋' },
+const NAV = [
+  { to: '/', label: 'Dashboard' },
+  { to: '/upload', label: 'Upload' },
+  { to: '/review', label: 'Review' },
+  { to: '/audit', label: 'Audit Trail' },
 ];
 
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="flex h-screen bg-slate-950">
-        <aside className="w-60 bg-slate-900 border-r border-slate-800 flex flex-col">
-          <div className="p-5 border-b border-slate-800">
-            <h1 className="text-lg font-bold text-emerald-400 tracking-tight">BreatheESG</h1>
-            <p className="text-xs text-slate-500 mt-0.5">Ingestion Platform</p>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-md bg-green-600 flex items-center justify-center">
+                <span className="text-white text-xs font-bold">B</span>
+              </div>
+              <span className="font-semibold text-gray-900 text-sm">BreatheESG</span>
+            </div>
+            <nav className="flex gap-1">
+              {NAV.map(n => (
+                <NavLink
+                  key={n.to}
+                  to={n.to}
+                  end={n.to === '/'}
+                  className={({ isActive }) =>
+                    `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-green-50 text-green-700'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                    }`
+                  }
+                >
+                  {n.label}
+                </NavLink>
+              ))}
+            </nav>
           </div>
-          <nav className="flex-1 p-3">
-            {NAV_ITEMS.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.path === '/'}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-2.5 rounded-lg mb-1 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-emerald-600/20 text-emerald-400'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`
-                }
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
-          </nav>
-        </aside>
-        <main className="flex-1 overflow-auto p-8">
+        </header>
+        <main className="max-w-7xl mx-auto px-6 py-8">
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/upload" element={<UploadPage />} />
-            <Route path="/suspicious" element={<SuspiciousPage />} />
-            <Route path="/audit-log" element={<AuditLogPage />} />
+            <Route path="/review" element={<SuspiciousPage />} />
+            <Route path="/audit" element={<AuditLogPage />} />
           </Routes>
         </main>
       </div>

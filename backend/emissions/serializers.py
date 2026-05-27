@@ -29,8 +29,9 @@ class EmissionRecordSerializer(serializers.ModelSerializer):
         model = EmissionRecord
         fields = [
             'id', 'company', 'company_name', 'upload', 'upload_file',
-            'row_number', 'source_type', 'category',
+            'row_number', 'source_type', 'scope', 'category',
             'raw_value', 'normalized_value', 'raw_unit', 'normalized_unit',
+            'emission_factor', 'co2_kg',
             'reporting_date', 'is_suspicious', 'suspicious_reason',
             'status', 'created_at',
         ]

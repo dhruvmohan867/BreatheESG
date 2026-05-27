@@ -3,6 +3,19 @@ import io
 from datetime import datetime
 
 
+EMISSION_FACTORS = {
+    'diesel': 2.68,
+    'petrol': 2.31,
+    'lpg': 1.51,
+    'natural_gas': 2.04,
+    'furnace_oil': 3.15,
+    'electricity_india': 0.82,
+    'flight_domestic': 0.255,
+    'flight_international': 0.195,
+    'flight_business': 0.39,
+}
+
+
 class BaseParserService:
     UNIT_MAP = {
         'ltr': ('L', 1),
@@ -18,6 +31,7 @@ class BaseParserService:
         'km': ('km', 1),
         'mi': ('km', 1.60934),
         'miles': ('km', 1.60934),
+        'scm': ('SCM', 1),
     }
 
     DATE_FORMATS = ['%Y-%m-%d', '%d/%m/%Y', '%m/%d/%Y', '%d-%m-%Y']
@@ -60,3 +74,11 @@ class BaseParserService:
 
     def process(self):
         raise NotImplementedError
+
+    def finalize_upload(self, records):
+        suspicious_count = sum(1 for r in records if r.is_suspicious)
+        self.upload.row_count = len(records)
+        self.upload.suspicious_count = suspicious_count
+        self.upload.status = 'completed'
+        self.upload.save()
+        return len(records)

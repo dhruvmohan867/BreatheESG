@@ -4,8 +4,8 @@ from django.db import models
 class AuditLog(models.Model):
     ACTION_CHOICES = [
         ('upload', 'File Upload'),
-        ('review_approve', 'Review Approved'),
-        ('review_reject', 'Review Rejected'),
+        ('review_approved', 'Review Approved'),
+        ('review_rejected', 'Review Rejected'),
     ]
 
     action = models.CharField(max_length=30, choices=ACTION_CHOICES)

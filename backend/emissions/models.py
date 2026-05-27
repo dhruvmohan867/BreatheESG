@@ -3,6 +3,7 @@ from django.db import models
 
 class Company(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    industry = models.CharField(max_length=100, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -18,6 +19,12 @@ class EmissionRecord(models.Model):
         ('sap_fuel', 'SAP Fuel/Procurement'),
         ('utility', 'Utility Electricity'),
         ('travel', 'Travel Platform'),
+    ]
+
+    SCOPE_CHOICES = [
+        (1, 'Scope 1 — Direct Emissions'),
+        (2, 'Scope 2 — Purchased Energy'),
+        (3, 'Scope 3 — Indirect / Value Chain'),
     ]
 
     STATUS_CHOICES = [
@@ -36,11 +43,14 @@ class EmissionRecord(models.Model):
     )
     row_number = models.PositiveIntegerField(null=True, blank=True)
     source_type = models.CharField(max_length=20, choices=SOURCE_TYPES)
-    category = models.CharField(max_length=100)
+    scope = models.PositiveSmallIntegerField(choices=SCOPE_CHOICES, default=1)
+    category = models.CharField(max_length=200)
     raw_value = models.FloatField()
     normalized_value = models.FloatField(null=True, blank=True)
     raw_unit = models.CharField(max_length=50, blank=True, default='')
     normalized_unit = models.CharField(max_length=50, blank=True, default='')
+    emission_factor = models.FloatField(null=True, blank=True)
+    co2_kg = models.FloatField(null=True, blank=True)
     reporting_date = models.DateField()
     is_suspicious = models.BooleanField(default=False)
     suspicious_reason = models.TextField(blank=True, default='')
@@ -52,4 +62,4 @@ class EmissionRecord(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.source_type} — {self.category} — {self.reporting_date}"
+        return f"Scope {self.scope} | {self.source_type} | {self.reporting_date}"
